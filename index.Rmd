@@ -3,11 +3,16 @@ title: "ML - Weight Lifting Exercise"
 subtitle: "Coursera Data-Specialization ML Course"
 author: "Idan Richman Goshen"
 date: "4/6/2017"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(caret)
+library(dplyr)
+library(e1071)
 ```
 
 ## Summary
@@ -17,17 +22,43 @@ first, we'll load our training and testing sets and then we'll use the ????? cla
 ## Background
 Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: <http://groupware.les.inf.puc-rio.br/har> (see the section on the Weight Lifting Exercise Dataset).
 
+## Data preparation
+I will load the .csv files with the data and select only the physical features from the accelerometers and eliminate variables such as time or stats. i decided to leave in the name variable because it makes sense that each person has its own unique data.
+```{r dataLoad}
+training <- read.csv("pml-training.csv")
+testing <- read.csv("pml-testing.csv")
 
-```{r cars}
-summary(cars)
+#training<-select(training,-c(user_name,X,new_window,num_window,raw_timestamp_part_1,raw_timestamp_part_2,cvtd_timestamp))
+
+features_col <- grep("^magnet|^gyros|^yaw|^roll|^pitch|^accel|^classe|^user",names(training))
+new_train <- training[,features_col]
+
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+## Check missing values and correlations
+```{r NAs}
+sum(is.na(new_train))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+There are no missing values!
+
+## Training the model
+
+Now i will train the model using 2 classifiers - first with decision tree, and second with linear discriminant analysis. i will use cross-validation technique of k-folds with 10 folds, repeated 3 times, to avoid over-fitting and to improve accuracy.
+
+```{r train}
+model <- train(classe~.,data=new_train,method="rpart",metric="Accuracy",trControl=trainControl(method="repeatedcv", number=10, repeats=3))
+model2 <- train(classe~.,data=new_train,method="lda",metric="Accuracy",trControl=trainControl(method="repeatedcv", number=10, repeats=3))
+
+model$results
+model2$results
+```
+
+as can see, the LDA classifier performed much better than the decision tree.
+Thus, i will use it to predict on the test set.
+
+``` {r prediction}
+pred <- predict(model2,newdata=testing)
+```
+
+
