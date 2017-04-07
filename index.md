@@ -195,4 +195,32 @@ Thus, i will use it to predict on the test set.
 pred <- predict(model3,newdata=testing)
 ```
 
+```
+## Loading required package: klaR
+```
+
+```
+## Loading required package: MASS
+```
+
+```
+## 
+## Attaching package: 'MASS'
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     select
+```
+
+```r
+pred
+```
+
+```
+##  [1] A A B A A E D B A A B C B A E E A B B B
+## Levels: A B C D E
+```
+
 I believe the out of sample error is somewhat higher than the error i got from my training set, mainly because our model is optimized to the training and CV sets, and not for data the model has never seen. This will cause lower accuracy on the test set.

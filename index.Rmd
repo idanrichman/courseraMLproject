@@ -74,6 +74,7 @@ Thus, i will use it to predict on the test set.
 
 ``` {r prediction}
 pred <- predict(model3,newdata=testing)
+pred
 ```
 
 I believe the out of sample error is somewhat higher than the error i got from my training set, mainly because our model is optimized to the training and CV sets, and not for data the model has never seen. This will cause lower accuracy on the test set.

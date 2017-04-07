@@ -243,6 +243,16 @@ new_train &lt;- training[,features_col]</code></pre>
 ## 9   1.0    1.0 0.4055563 0.2436072 0.005933536 0.006951252</code></pre>
 <p>as can see, the RDA classifier performed much better than the others. Thus, i will use it to predict on the test set.</p>
 <pre class="r"><code>pred &lt;- predict(model3,newdata=testing)</code></pre>
+<pre><code>## Loading required package: klaR</code></pre>
+<pre><code>## Loading required package: MASS</code></pre>
+<pre><code>## 
+## Attaching package: 'MASS'</code></pre>
+<pre><code>## The following object is masked from 'package:dplyr':
+## 
+##     select</code></pre>
+<pre class="r"><code>pred</code></pre>
+<pre><code>##  [1] A A B A A E D B A A B C B A E E A B B B
+## Levels: A B C D E</code></pre>
 <p>I believe the out of sample error is somewhat higher than the error i got from my training set, mainly because our model is optimized to the training and CV sets, and not for data the model has never seen. This will cause lower accuracy on the test set.</p>
 </div>
 
