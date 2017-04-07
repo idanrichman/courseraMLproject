@@ -42,6 +42,18 @@ sum(is.na(new_train))
 
 There are no missing values!
 
+## Getting some notion of the data
+```{r exploratory}
+str(new_train)
+boxplot(new_train)
+```
+
+In the boxplot we can spot an outlier. Even if measured correctly (and not a false measure) this outlier can cause some bias, and i think it it better to exclude it.
+
+``` {r outlier}
+ new_train <- new_train[-which(new_train$magnet_dumbbell_y < -3000),]
+```
+
 ## Training the model
 
 Now i will train the model using 3 classifiers - first with decision tree, second with linear discriminant analysis, as it is a simple and effective method for classification. Third, i used regularized discriminant analysis to mitigate high impacting predictors causing over-fitting. I also wanted to train using random forset, but it took too much computation time and left me hanging.
