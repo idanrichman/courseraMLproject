@@ -16,8 +16,8 @@ library(e1071)
 ```
 
 ## Summary
-Using the data from the accelerometers, we'll try to predict the manner in which the weight lifting exercise is done - correctly or incorrectly.
-first, we'll load our training and testing sets and then we'll use the ????? classifier to train our model. 
+Using the data from the accelerometers, we'll try to predict the manner in which the weight lifting exercise is done - covering 5 different methods.
+first, we'll load our training and testing sets and then we'll look for a classifier to train our model, which gives us a good accuracy and prediction. 
 
 ## Background
 Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: <http://groupware.les.inf.puc-rio.br/har> (see the section on the Weight Lifting Exercise Dataset).
@@ -35,7 +35,7 @@ new_train <- training[,features_col]
 
 ```
 
-## Check missing values and correlations
+## Check missing values
 ```{r NAs}
 sum(is.na(new_train))
 ```
@@ -44,21 +44,24 @@ There are no missing values!
 
 ## Training the model
 
-Now i will train the model using 2 classifiers - first with decision tree, and second with linear discriminant analysis. i will use cross-validation technique of k-folds with 10 folds, repeated 3 times, to avoid over-fitting and to improve accuracy.
+Now i will train the model using 3 classifiers - first with decision tree, second with linear discriminant analysis, as it is a simple and effective method for classification. Third, i used regularized discriminant analysis to mitigate high impacting predictors causing over-fitting. I also wanted to train using random forset, but it took too much computation time and left me hanging.
+I will use cross-validation technique of k-folds with 10 folds, repeated 3 times, to avoid over-fitting and to improve accuracy.
 
-```{r train}
+```{r train, cache=TRUE}
 model <- train(classe~.,data=new_train,method="rpart",metric="Accuracy",trControl=trainControl(method="repeatedcv", number=10, repeats=3))
 model2 <- train(classe~.,data=new_train,method="lda",metric="Accuracy",trControl=trainControl(method="repeatedcv", number=10, repeats=3))
+model3 <- train(classe~.,data=new_train,method="rda")
 
 model$results
 model2$results
+model3$results
 ```
 
-as can see, the LDA classifier performed much better than the decision tree.
+as can see, the RDA classifier performed much better than the others.
 Thus, i will use it to predict on the test set.
 
 ``` {r prediction}
-pred <- predict(model2,newdata=testing)
+pred <- predict(model3,newdata=testing)
 ```
 
-
+I believe the out of sample error is somewhat higher than the error i got from my training set, mainly because our model is optimized to the training and CV sets, and not for data the model has never seen. This will cause lower accuracy on the test set.
